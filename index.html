@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Calculator</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg,#101827,#263c55);
+  font-family: Arial,sans-serif;
+  padding: 15px;
+}
+
+.calculator {
+  width: 100%;
+  max-width: 370px;
+  background: #172333;
+  padding: 22px;
+  border-radius: 25px;
+  box-shadow: 0 15px 40px #0008;
+}
+
+h2 {
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.display {
+  width: 100%;
+  height: 90px;
+  background: #0b1420;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 32px;
+  text-align: right;
+  padding: 15px;
+  margin-bottom: 18px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px;
+}
+
+button {
+  height: 65px;
+  border: none;
+  border-radius: 13px;
+  background: #29394e;
+  color: white;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(.94);
+}
+
+.operator {
+  background: #bd9140;
+}
+
+.clear {
+  background: #d94b4b;
+}
+
+.equal {
+  background: #159b75;
+  grid-column: span 2;
+}
+
+.zero {
+  grid-column: span 2;
+}
+
+.footer {
+  color: #9caabd;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+  <h2>MY CALCULATOR</h2>
+
+  <input type="text" id="display"
+  class="display" value="0" readonly>
+
+  <div class="buttons">
+    <button class="clear" onclick="clearDisplay()">C</button>
+    <button onclick="deleteLast()">DEL</button>
+    <button class="operator" onclick="percent()">%</button>
+    <button class="operator" onclick="add('/')">÷</button>
+
+    <button onclick="add('7')">7</button>
+    <button onclick="add('8')">8</button>
+    <button onclick="add('9')">9</button>
+    <button class="operator" onclick="add('*')">×</button>
+
+    <button onclick="add('4')">4</button>
+    <button onclick="add('5')">5</button>
+    <button onclick="add('6')">6</button>
+    <button class="operator" onclick="add('-')">−</button>
+
+    <button onclick="add('1')">1</button>
+    <button onclick="add('2')">2</button>
+    <button onclick="add('3')">3</button>
+    <button class="operator" onclick="add('+')">+</button>
+
+    <button class="zero" onclick="add('0')">0</button>
+    <button onclick="add('.')">.</button>
+    <button class="equal" onclick="calculate()">=</button>
+  </div>
+
+  <div class="footer">
+    Online Calculator | Created with HTML, CSS & JavaScript
+  </div>
+</div>
+
+<script>
+const display = document.getElementById("display");
+let expression = "";
+let finished = false;
+
+function update() {
+  display.value = expression || "0";
+}
+
+function add(value) {
+  if (finished) {
+    expression = "";
+    finished = false;
+  }
+
+  if ("+-*/".includes(value)) {
+    if (!expression && value !== "-") return;
+
+    if (/[+\-*/]$/.test(expression)) {
+      expression = expression.slice(0,-1);
+    }
+  }
+
+  expression += value;
+  update();
+}
+
+function clearDisplay() {
+  expression = "";
+  finished = false;
+  update();
+}
+
+function deleteLast() {
+  expression = expression.slice(0,-1);
+  finished = false;
+  update();
+}
+
+function calculate() {
+  try {
+    if (!expression || !/^[0-9+\-*/.() ]+$/.test(expression)) {
+      throw new Error();
+    }
+
+    if (/[+\-*/.]$/.test(expression)) {
+      throw new Error();
+    }
+
+    const result = Function(
+      '"use strict"; return (' + expression + ')'
+    )();
+
+    if (!Number.isFinite(result)) throw new Error();
+
+    expression = String(Number(result.toPrecision(12)));
+    finished = true;
+    update();
+
+  } catch {
+    display.value = "Error";
+    expression = "";
+    finished = true;
+  }
+}
+
+function percent() {
+  try {
+    if (!expression || !/^[0-9.]+$/.test(expression)) {
+      return;
+    }
+    expression = String(Number(expression) / 100);
+    update();
+  } catch {
+    display.value = "Error";
+  }
+}
+</script>
+
+</body>
+</html>
